@@ -50,6 +50,7 @@ class RiakOutput < Fluent::BufferedOutput
   def write(chunk)
     data = chunk.read
     print data
+    p "============================================="
   end
 
 end
