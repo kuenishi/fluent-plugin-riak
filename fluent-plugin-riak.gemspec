@@ -6,7 +6,7 @@ Gem::Specification.new do |gem|
   gem.description = "Riak plugin for Fluent event collector"
   gem.homepage    = "https://github.com/kuenishi/fluent-plugin-riak"
   gem.summary     = gem.description
-  gem.version     = '0.0.1' #File.read("VERSION").strip
+  gem.version     = File.read("VERSION").strip
   gem.authors     = ["Kota UENISHI"]
   gem.email       = "kuenishi@gmail.com"
   gem.has_rdoc    = false
