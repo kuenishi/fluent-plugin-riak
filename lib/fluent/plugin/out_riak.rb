@@ -19,22 +19,19 @@ class RiakOutput < BufferedOutput
   def configure(conf)
     super
 
-    @nodes = conf['nodes'].split(',').map{ |s|
+    @nodes = @nodes.split(',').map{ |s|
       ip,port = s.split(':')
       {:host => ip, :pb_port => port.to_i}
     }
     $log.debug "@nodes = #{@nodes}"
-
   end
 
   def start
-    super
     $log.debug " => #{@buffer.chunk_limit} #{@buffer.queue_limit} "
     @conn = Riak::Client.new(:nodes => @nodes, :protocol => "pbc")
     @bucket = @conn.bucket("fluentlog")
     @buf = {}
-  end
-  def shutdown
+
     super
   end
 
@@ -42,31 +39,17 @@ class RiakOutput < BufferedOutput
     [time, record].to_msgpack
   end
 
-  def emit(tag, es, chain)
-# #    $log.debug "#{@buffer} #{es}"
-    #es.to_msgpack
-#   end
-    chain.next
-    es.each { |time, record|
-      key = tag + "|" + time.to_s + "|" + @buf.size.to_s
-      @buf[key] = record
-    }
-
-    if @buf.size > @buffer.queue_limit then # FIXME: hand-made buffer
-      n = @buf.size
-      k = put_now(@buf)
-      @buf = {}
-      $log.debug "#{n} objects inserted with key=#{k}"
-    end
-  end
-
   def write(chunk)
     $log.warn " <<<<<===========\n"
-    # records  = []
-    # chunk.msgpack_each { |record|
-    #   records << record
-    # }
-    # $log.debug "#{records}"
+
+    records  = []
+    chunk.msgpack_each { |time, record|
+      # TODO: time processing and tag processing
+      records << record
+    }
+    $log.debug "#{records}"
+
+    put_now(records)
   end
 
   private
@@ -74,10 +57,10 @@ class RiakOutput < BufferedOutput
   # TODO: add index for some analysis
   def put_now(obj)
     key = Time.now.to_i.to_s
-    obj = Riak::RObject.new(@bucket, key)
-    obj.raw_data = obj.to_json
-    obj.content_type = 'text/json'
-    obj.store
+    robj = Riak::RObject.new(@bucket, key)
+    robj.raw_data = obj.to_json
+    robj.content_type = 'text/json'
+    robj.store
     key
   end
 
