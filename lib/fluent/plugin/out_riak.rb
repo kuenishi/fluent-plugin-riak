@@ -28,6 +28,7 @@ class RiakOutput < BufferedOutput
   end
 
   def start
+    super
     $log.debug " => #{@buffer.chunk_limit} #{@buffer.queue_limit} "
     @conn = Riak::Client.new(:nodes => @nodes, :protocol => "pbc")
     @bucket = @conn.bucket("fluentlog")
