@@ -24,7 +24,6 @@ class RiakOutput < BufferedOutput
       {:host => ip, :pb_port => port.to_i}
     }
     $log.debug "@nodes = #{@nodes}"
-
   end
 
   def start
@@ -40,33 +39,17 @@ class RiakOutput < BufferedOutput
     [time, record].to_msgpack
   end
 
-  def emit(tag, es, chain)
-# #    $log.debug "#{@buffer} #{es}"
-    #es.to_msgpack
-#   end
-
-    es.each { |time, record|
-      key = tag + "|" + time.to_s + "|" + @buf.size.to_s
-      @buf[key] = record
-    }
-
-    if @buf.size > @buffer.queue_limit then # FIXME: hand-made buffer
-      n = @buf.size
-      k = put_now(@buf)
-      @buf = {}
-      $log.debug "#{n} objects inserted with key=#{k}"
-    end
-
-    chain.next
-  end
-
   def write(chunk)
     $log.warn " <<<<<===========\n"
-    # records  = []
-    # chunk.msgpack_each { |record|
-    #   records << record
-    # }
-    # $log.debug "#{records}"
+
+    records  = []
+    chunk.msgpack_each { |time, record|
+      # TODO: time processing and tag processing
+      records << record
+    }
+    $log.debug "#{records}"
+
+    put_now(records)
   end
 
   private
