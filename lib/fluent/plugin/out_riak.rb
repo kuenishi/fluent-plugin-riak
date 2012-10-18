@@ -23,7 +23,7 @@ class RiakOutput < BufferedOutput
       ip,port = s.split(':')
       {:host => ip, :pb_port => port.to_i}
     }
-    $log.debug "@nodes = #{@nodes}"
+    $log.info "riak nodes=#{@nodes}"
   end
 
   def start
@@ -46,9 +46,8 @@ class RiakOutput < BufferedOutput
     chunk.msgpack_each { |time, record|
       # TODO: time processing and tag processing
       records << record
+      $log.debug record
     }
-    $log.debug "#{records}"
-
     put_now(records)
   end
 
