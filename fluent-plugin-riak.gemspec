@@ -18,6 +18,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "fluentd", "~> 0.10.7"
   gem.add_dependency "riak-client", "~> 1.0.0"
+  gem.add_dependency "uuidtools", ">= 2.1.3"
   gem.add_development_dependency "rake", ">= 0.9.2"
   gem.add_development_dependency "simplecov", ">= 0.5.4"
   gem.add_development_dependency "rr", ">= 1.0.0"
