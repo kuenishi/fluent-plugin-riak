@@ -1,7 +1,7 @@
 require 'riak'
 
-nodes = [{ :host => "192.168.62.129",
-           :pb_port => 8081 }]
+nodes = [{ :host => "127.0.0.1",
+           :pb_port => 8087 }]
 
 
 c = Riak::Client.new( :nodes => nodes, :protocol => "pbc" )
