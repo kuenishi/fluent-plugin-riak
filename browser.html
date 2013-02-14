@@ -1,0 +1,125 @@
+<html>
+<head>
+  <title>Riak mapreducer</title>
+  <script lang="JavaScript">
+    <!--
+        function query(){
+        var m = document.getElementById("map").value;
+        var r = document.getElementById("reduce").value;
+        //console.log(m);
+        //console.log(r);
+        //var reqBox = document.getElementById("request");
+        var q = {
+        inputs : "data",
+        query : [ 
+        { map: { language: "javascript", source: m } },
+        { reduce: { language: "javascript", source: r } }
+        ]};
+        //reqBox.innerText = JSON.stringify(q, null, " ");
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.open("POST", "/mapred", false);
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(JSON.stringify(q, null, ""));
+        var result = xmlhttp.responseText;
+        console.log(result);
+
+        var resultBox = document.getElementById("result");
+        //console.log(resultBox);
+        resultBox.innerText = result;
+        }
+      -->
+    </script>
+</head>
+<body style="background: #678; text-align: center; width: 100%; font-family: 'Titillium', Monospace;">
+
+  <div style="width: 80%; height: 100%; background: #ddd; padding: 20px; text-align: left; margin: 0px auto;">
+    <h1>Riak toybox</h1>
+    <h2>mapreduce</h2>
+    <center>
+      <table style="border: 1px solid black;">
+        <tr><th>map</th> <th>reduce</th></tr>
+        <tr>
+          <td>
+<textarea name="map" id="map" cols="50" rows="10">
+function(v){
+  var data = v.values[0].data;
+  var c = JSON.parse(data);
+  return [c.count];
+}
+</textarea>
+          </td><td>
+<textarea name="reduce" id="reduce" cols="50" rows="10" >
+function(v){
+  var sum = 0;
+  for( var i=0; i < v.length; ++i){
+    sum += v[i];
+  }
+  return [sum];
+}
+</textarea>
+        </td></tr>
+        <tr><td colspan="2"><center> 
+              <a href="#" onClick="query();" width="300">query</a></center>
+        </td></tr>
+        <tr> <!-- th>request</th><td>
+                  <pre><div id="request"></div></pre> </td>  -->
+          <th colspan="2">result</th> </tr>
+        <tr>
+          <td colspan="2">
+            <pre><div id="result" style="font-size: large;" ></div></pre> </td>
+        </tr>
+      </table>
+    </center>
+
+    <h2>Riak object viewer</h2>
+    <script lang="JavaScript">
+      function get(){
+      var key = document.getElementById("key").value;
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("GET", "/buckets/data/keys/"+key, false);
+      xmlhttp.send();
+      var result = xmlhttp.responseText;
+      console.log(result);
+      document.getElementById("object").innerText = result;
+      }
+    </script>
+    <a href="#" onClick="get();" >get</a> <input type="text" id="key" />
+    <div id="object"></div>
+    
+    <h2>Riak object putter</h2>
+    <script lang="JavaScript">
+      function put(){
+      var key = document.getElementById("key2").value;
+      var value = document.getElementById("value").value;
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("PUT", "/buckets/data/keys/"+key, false);
+      xmlhttp.setRequestHeader("Content-Type", "application/json");
+      xmlhttp.send(value);
+      var result = xmlhttp.responseText;
+      console.log(result);
+      document.getElementById("object2").innerText = result;
+      }
+    </script>
+     <a href="#" onClick="put();" >put</a> <input type="text" id="key2" /> <input type="text" id="value" />
+    <div id="object2"></div>
+    
+    <h2>Riak keylister</h2>
+    <script lang="JavaScript">
+      function listkeys(){
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("GET", "/buckets/data/keys?keys=true", false);
+      xmlhttp.send();
+      var result = xmlhttp.responseText;
+      console.log(result);
+      document.getElementById("keylist").innerText = result;
+      }
+    </script>
+    <a href="#" onClick="listkeys();" >listkeys</a>
+    <div id="keylist"></div>
+    <hr/>
+    (C)@kuenishi distributed under Apache 2 license
+  </div>
+
+</body>
+</html>

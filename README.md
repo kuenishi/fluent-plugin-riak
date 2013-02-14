@@ -28,12 +28,21 @@ fluent.conf example
 
 ```
 
-key format -> 2013-02-<uuid>
-value format -> [records] in JSON
-index:
-  year_int -> year
-  month_bin -> <year>-<month>
-  tag_bin -> tags
+- key format -> 2013-02-<uuid>
+- value format -> [records] in JSON
+- index:
+
+ - year_int -> year
+ - month_bin -> <year>-<month>
+ - tag_bin -> tags
+
+easy querying log
+-----------------
+
+```bash
+$ curl -X PUT http://localhost:8098/buckets/static/keys/browser.html -H 'Content-type: text/html' -d @browser.html
+$ open http://localhost:8098/buckets/static/keys/browser.html
+```
 
 Pros
 ----
