@@ -5,6 +5,15 @@ fluent-plugin-riak is a alternative for people who are not sufficient with mongo
 
 Current status is still proof-of-concept: index setting and its configuration are to be decided. Also performance optimization is required. Another idea is in_tail_riak by using riak post-commit.
 
+installation
+------------
+
+```bash
+$ sudo gem install fluent-plugin-riak
+```
+
+Notice: you need Riak configured using eleveldb as backend.
+
 
 fluent.conf example
 -------------------
@@ -56,6 +65,12 @@ Cons
 ----
 
 - no capped table, TTL objects
+
+TODOs
+-----
+
+- refine browser.html query interface with cool features
+- rething index structures
 
 
 License
