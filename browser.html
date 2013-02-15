@@ -1,47 +1,62 @@
 <html>
 <head>
   <title>Riak mapreducer</title>
+  <style type="text/css">
+body {
+  background: #678; text-align: center; width: 100%; font-family: 'Titillium', Monospace;
+}
+body div {
+  width: 80%; background: #ddd;
+  padding: 20px; text-align: left; margin: 0px auto;
+}
+h2 {
+  padding: 0px;
+  margin: 0px auto;
+}
+a {
+  text-shadow: 1px 1px #888888;
+  text-decoration:underline;
+}
+  </style>
   <script lang="JavaScript">
-    <!--
-        function query(){
-        var m = document.getElementById("map").value;
-        var r = document.getElementById("reduce").value;
-        //console.log(m);
-        //console.log(r);
-        //var reqBox = document.getElementById("request");
-        var q = {
-        inputs : "data",
-        query : [ 
-        { map: { language: "javascript", source: m } },
-        { reduce: { language: "javascript", source: r } }
-        ]};
-        //reqBox.innerText = JSON.stringify(q, null, " ");
+    function get_map(){    return document.getElementById("map").value; }
+    function get_reduce(){ return document.getElementById("reduce").value; }
+    function get_bucketname(){ return document.getElementById("bucket").value; }
+    function exec_query(m, r){
+      var q = { inputs : get_bucketname(),
+      query : [
+        { map:    { language: "javascript", source: m}},
+        { reduce: { language: "javascript", source: r}}
+      ]};
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("POST", "/mapred", false);
+      xmlhttp.setRequestHeader("Content-Type", "application/json");
+      xmlhttp.send(JSON.stringify(q, null, ""));
+      var result = xmlhttp.responseText;
 
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("POST", "/mapred", false);
-        xmlhttp.setRequestHeader("Content-Type", "application/json");
-        xmlhttp.send(JSON.stringify(q, null, ""));
-        var result = xmlhttp.responseText;
-        console.log(result);
-
-        var resultBox = document.getElementById("result");
-        //console.log(resultBox);
-        resultBox.innerText = result;
-        }
-      -->
-    </script>
+      var resultBox = document.getElementById("result");
+      resultBox.innerText = result;
+    }
+  </script>
 </head>
-<body style="background: #678; text-align: center; width: 100%; font-family: 'Titillium', Monospace;">
 
-  <div style="width: 80%; height: 100%; background: #ddd; padding: 20px; text-align: left; margin: 0px auto;">
-    <h1>Riak toybox</h1>
-    <h2>mapreduce</h2>
-    <center>
-      <table style="border: 1px solid black;">
-        <tr><th>map</th> <th>reduce</th></tr>
-        <tr>
-          <td>
-<textarea name="map" id="map" cols="50" rows="10">
+<body>
+  <div id="content">
+    <div style="text-align:right">
+    <script lang="JavaScript">
+    </script>
+    bucket name:<input type="text" id="bucket" value="fluentlog"/>
+    </div>
+
+    <h2>Run mapreduce on fluentd log</h2>
+    <table style="border: 1px solid black;">
+      <tr>
+        <th>map</th> <th>reduce</th>
+        <th> <a onClick="exec_query(get_map(), get_reduce());">query</a> </th>
+      </tr>
+      <tr>
+        <td>
+<textarea name="map" id="map" rows="10">
 function(v){
   var data = v.values[0].data;
   var c = JSON.parse(data);
@@ -49,7 +64,7 @@ function(v){
 }
 </textarea>
           </td><td>
-<textarea name="reduce" id="reduce" cols="50" rows="10" >
+<textarea name="reduce" id="reduce" rows="10" >
 function(v){
   var sum = 0;
   for( var i=0; i < v.length; ++i){
@@ -58,42 +73,92 @@ function(v){
   return [sum];
 }
 </textarea>
-        </td></tr>
-        <tr><td colspan="2"><center> 
-              <a href="#" onClick="query();" width="300">query</a></center>
-        </td></tr>
-        <tr> <!-- th>request</th><td>
-                  <pre><div id="request"></div></pre> </td>  -->
-          <th colspan="2">result</th> </tr>
-        <tr>
-          <td colspan="2">
-            <pre><div id="result" style="font-size: large;" ></div></pre> </td>
-        </tr>
-      </table>
-    </center>
+        </td>
+        <td width="200px">
+    <div id="result" style="font: bold;"></div>
+    </td>
+    </tr>
+      <tr><td colspan="3">
+          <script lang="JavaScript">
+            function grep(){
+            
+            }
+          </script>
+          <script lang="JavaScript" type="text/javascript">
+            function count_rank(){
+            var m = "function(v){
+      var data = v.values[0].data;
+      var c = JSON.parse(data);
+      var tags = {};
+      for(var i=0; i<c.length; ++i){
+        count = tags[c[i].tag];
+        if(count == null){ tags[c[i].tag] = 1; }
+        else{              tags[c[i].tag] = count+1; }
+      }
+      return [tags];
+    }";
+      var r = "function(v){
+      var tags = {};
+      for(var i=0; i<v.length; ++i){
+        for (var prop in v[i]) {
+          count = tags[prop];
+          if(count == null){ tags[prop] = v[i][prop]; }
+          else{              tags[prop] = count+v[i][prop]; }
+        }
+      }
+      return [tags];
+    }";
+            exec_query(m, r);
+          }
+          </script>
 
+          <!-- <a onClick="grep();">grep</a> <input type="text" id="grep" value="debug"/> -->
+          <a onClick="count_rank();">count&amp;rank</a> <input type="text" id="count_rank" value="tag"/>
+      </td></tr>
+    </table>
+
+    <hr/>
     <h2>Riak object viewer</h2>
     <script lang="JavaScript">
       function get(){
       var key = document.getElementById("key").value;
       var xmlhttp = new XMLHttpRequest();
-      xmlhttp.open("GET", "/buckets/data/keys/"+key, false);
+      xmlhttp.open("GET", "/buckets/"+ get_bucketname() +"/keys/"+key, false);
       xmlhttp.send();
       var result = xmlhttp.responseText;
       console.log(result);
       document.getElementById("object").innerText = result;
       }
     </script>
-    <a href="#" onClick="get();" >get</a> <input type="text" id="key" />
+    <a onClick="get();" >get</a> <input type="text" id="key" />
     <div id="object"></div>
     
+    
+    <h2>Riak keylister</h2>
+    <script lang="JavaScript">
+      function listkeys(){
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.open("GET", "/buckets/"+ get_bucketname() +"/keys?keys=true", false);
+      xmlhttp.send();
+      var result = JSON.parse(xmlhttp.responseText);
+      console.log(result);
+      
+      document.getElementById("keylist").innerText = result.keys.sort().join("\n");
+      }
+    </script>
+    <a onClick="listkeys();" >listkeys</a>
+    <div id="keylist"></div>
+    <hr/>
+    (C)@kuenishi distributed under Apache 2 license
+  </div>
+<!--
     <h2>Riak object putter</h2>
     <script lang="JavaScript">
       function put(){
       var key = document.getElementById("key2").value;
       var value = document.getElementById("value").value;
       var xmlhttp = new XMLHttpRequest();
-      xmlhttp.open("PUT", "/buckets/data/keys/"+key, false);
+      xmlhttp.open("PUT", "/buckets/fluentlog/keys/"+key, false);
       xmlhttp.setRequestHeader("Content-Type", "application/json");
       xmlhttp.send(value);
       var result = xmlhttp.responseText;
@@ -101,25 +166,9 @@ function(v){
       document.getElementById("object2").innerText = result;
       }
     </script>
-     <a href="#" onClick="put();" >put</a> <input type="text" id="key2" /> <input type="text" id="value" />
+     <a onClick="put();" >put</a> <input type="text" id="key2" /> <input type="text" id="value" />
     <div id="object2"></div>
-    
-    <h2>Riak keylister</h2>
-    <script lang="JavaScript">
-      function listkeys(){
-      var xmlhttp = new XMLHttpRequest();
-      xmlhttp.open("GET", "/buckets/data/keys?keys=true", false);
-      xmlhttp.send();
-      var result = xmlhttp.responseText;
-      console.log(result);
-      document.getElementById("keylist").innerText = result;
-      }
-    </script>
-    <a href="#" onClick="listkeys();" >listkeys</a>
-    <div id="keylist"></div>
-    <hr/>
-    (C)@kuenishi distributed under Apache 2 license
-  </div>
+-->
 
 </body>
 </html>
