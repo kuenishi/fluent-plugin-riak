@@ -52,11 +52,10 @@ a {
     <table style="border: 1px solid black;">
       <tr>
         <th>map</th> <th>reduce</th>
-        <th> <a onClick="exec_query(get_map(), get_reduce());">query</a> </th>
       </tr>
       <tr>
         <td>
-<textarea name="map" id="map" rows="10">
+<textarea name="map" id="map" rows="16" cols="50">
 function(v){
   var data = v.values[0].data;
   var c = JSON.parse(data);
@@ -64,7 +63,7 @@ function(v){
 }
 </textarea>
           </td><td>
-<textarea name="reduce" id="reduce" rows="10" >
+<textarea name="reduce" id="reduce" rows="16" cols="50" >
 function(v){
   var sum = 0;
   for( var i=0; i < v.length; ++i){
@@ -74,7 +73,12 @@ function(v){
 }
 </textarea>
         </td>
-        <td width="200px">
+      </tr>
+      <tr>
+        <th colspan="2"> <a onClick="exec_query(get_map(), get_reduce());">query</a> </th>
+      </tr>
+      <tr>
+        <td width="200px" colspan="2">
     <div id="result" style="font: bold;"></div>
     </td>
     </tr>
