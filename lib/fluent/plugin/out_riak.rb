@@ -58,18 +58,20 @@ class RiakOutput < BufferedOutput
 
   # TODO: add index for some analysis
   def put_now(records, tags)
-    today = Date.today
-    key = "#{today.to_s}-#{UUIDTools::UUID.random_create.to_s}"
-    robj = Riak::RObject.new(@bucket, key)
-    robj.raw_data = records.to_json
-    robj.indexes['year_int'] << today.year
-    robj.indexes['month_bin'] << "#{today.year}-#{today.month}"
-    tags.each do |tag|
-      robj.indexes['tag_bin'] << tag
+    if not records.empty? then
+      today = Date.today
+      key = "#{today.to_s}-#{UUIDTools::UUID.random_create.to_s}"
+      robj = Riak::RObject.new(@bucket, key)
+      robj.raw_data = records.to_json
+      robj.indexes['year_int'] << today.year
+      robj.indexes['month_bin'] << "#{today.year}-#{today.month}"
+      tags.each do |tag|
+        robj.indexes['tag_bin'] << tag
+      end
+      robj.content_type = 'application/json'
+      robj.store
+      robj
     end
-    robj.content_type = 'application/json'
-    robj.store
-    robj
   end
 
 end

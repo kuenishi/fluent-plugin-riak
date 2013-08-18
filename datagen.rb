@@ -16,8 +16,11 @@ s = <<EOS
 }
 EOS
 
-c = Riak::Client.new(:protocol => "http")
-bucket = c.bucket("spam")
+c = Riak::Client.new(:protocol => "pbc",
+                     :nodes => [{:host => "localhost",
+                                 :pb_port => 8087
+                                }])
+bucket = c.bucket("fluentlog")
 
 class Gen
   def initialize
