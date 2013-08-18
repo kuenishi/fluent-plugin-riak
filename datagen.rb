@@ -63,7 +63,9 @@ class Gen
       :referer => "",
       :agent => "",
       :time => time,
-      :tag => tag
+      :tag => tag,
+      :rand => @r.rand,
+      :randint => @r.rand(65536)
     }
   end
 end
@@ -72,8 +74,9 @@ g = Gen.new
 
 n = ARGV.shift.to_i
 (0..n).each do |i|
+  now = Time.now.strftime("%Y%m%d-%H%M%S")
   today = Date.today
-  key = "#{today.to_s}-#{i}"
+  key = "#{now.to_s}-#{Process.pid}#{i}"
   robj = Riak::RObject.new(bucket, key)
   records = g.gen
   robj.raw_data = records.to_json
