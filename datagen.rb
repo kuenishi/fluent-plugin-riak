@@ -18,7 +18,7 @@ EOS
 
 c = Riak::Client.new(:protocol => "pbc",
                      :nodes => [{:host => "localhost",
-                                 :pb_port => 8087
+                                 :pb_port => 10017
                                 }])
 bucket = c.bucket("fluentlog")
 
@@ -64,8 +64,8 @@ class Gen
       :agent => "",
       :time => time,
       :tag => tag,
-      :rand => @r.rand,
-      :randint => @r.rand(65536)
+      :rand_f => @r.rand,
+      :rand_i => @r.rand(65536)
     }
   end
 end
