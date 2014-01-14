@@ -8,6 +8,7 @@ class RiakOutput < BufferedOutput
   include SetTagKeyMixin
   config_set_default :include_time_key, true
 
+  config_param :bucket_name, :string, :default => "fluentlog"
   config_param :nodes, :string, :default => "localhost:8087"
 
   def initialize
@@ -30,7 +31,7 @@ class RiakOutput < BufferedOutput
   def start
     $log.debug " => #{@buffer.chunk_limit} #{@buffer.queue_limit} "
     @conn = Riak::Client.new(:nodes => @nodes, :protocol => "pbc")
-    @bucket = @conn.bucket("fluentlog")
+    @bucket = @conn.bucket(@bucket_name)
     @buf = {}
 
     super
