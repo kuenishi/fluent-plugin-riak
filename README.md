@@ -1,4 +1,4 @@
-fluent-plugin-riak
+fluent-plugin-riak, a plugin for [Fluentd](http://fluentd.org)
 ==================
 
 fluent-plugin-riak is a alternative for people who are not sufficient with mongo or webhdfs. Riak ( http://github.com/basho/riak ) is an open-source distributed KVS focused on availability. It also has a strong query system with secondary index (2i): see docs ( http://docs.basho.com/riak/latest/tutorials/querying/ ) for details.
