@@ -65,7 +65,7 @@ class RiakOutput < BufferedOutput
       robj = Riak::RObject.new(@bucket, key)
       robj.raw_data = records.to_json
       robj.indexes['year_int'] << today.year
-      robj.indexes['month_bin'] << "#{today.year}-#{today.month}"
+      robj.indexes['month_bin'] << "#{today.year}-#{"%02d" % today.month}"
       tags.each do |tag|
         robj.indexes['tag_bin'] << tag
       end
